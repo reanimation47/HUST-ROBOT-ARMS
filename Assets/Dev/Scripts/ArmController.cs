@@ -149,7 +149,7 @@ public class ArmController : MonoBehaviour
 
 
 
-        if(Mathf.Abs(t_arm.y - 0) <= 0.01f && CurrentSequenceState == 1)
+        if(Mathf.Abs(Mathf.Abs(t_arm.y) - 0) <= 0.005f && CurrentSequenceState == 1)
         {
             Part0_mState = HoriontalMovement.NONE;
             CurrentSequenceState += 1;
@@ -181,7 +181,50 @@ public class ArmController : MonoBehaviour
         {
             CurrentSequenceState += 1;
             Part1_mState = VerticalMovement.NONE;
+            Part0_mState = HoriontalMovement.CLOCKWISE;
         }
+
+        if(Mathf.Abs(Mathf.Abs(t_arm.y) - 0.707f) <= 0.0005f && CurrentSequenceState == 7)
+        {
+            CurrentSequenceState += 1;
+            Part0_mState = HoriontalMovement.NONE;
+            Part1_mState = VerticalMovement.UPWARDS;
+        }
+
+        if(Mathf.Abs(Mathf.Abs(q1_arm.x) - 0.56f) <= 0.001f && CurrentSequenceState == 8)
+        {
+            CurrentSequenceState += 1;
+            Part1_mState = VerticalMovement.NONE;
+            Part3_mState = VerticalMovement.DOWNWARDS;
+        }
+
+        if(Mathf.Abs(Mathf.Abs(q3_arm.x) - 0.6f) <= 0.001f && CurrentSequenceState == 9)
+        {
+            CurrentSequenceState += 1;
+            Part3_mState = VerticalMovement.NONE;
+            grip = false;
+            Invoke("NextStep", 1f);
+        }
+
+        if(CurrentSequenceState == 11)
+        {
+            CurrentSequenceState += 1;
+            Part1_mState = VerticalMovement.DOWNWARDS;
+        }
+
+        if(Mathf.Abs(Mathf.Abs(q1_arm.x) - 0f) <= 0.002f && CurrentSequenceState == 12)
+        {
+            CurrentSequenceState += 1;
+            Part1_mState = VerticalMovement.NONE;
+            Part0_mState = HoriontalMovement.COUNTERCLOCKWISE;
+        }
+
+        if(Mathf.Abs(Mathf.Abs(t_arm.y) - 0.5f) <= 0.002f && CurrentSequenceState == 13)
+        {
+            CurrentSequenceState += 1;
+            Part0_mState = HoriontalMovement.NONE;
+        }
+
         Debug.LogWarning(t_arm.y);
 
 
