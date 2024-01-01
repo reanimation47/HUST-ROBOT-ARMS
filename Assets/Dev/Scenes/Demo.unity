@@ -146,9 +146,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 441780173}
-  m_LocalRotation: {x: -0.7069834, y: -0, z: -0, w: 0.7072302}
-  m_LocalPosition: {x: 1.451, y: 7.96, z: 3.7009823}
-  m_LocalScale: {x: 31.42, y: 31.420034, z: 31.420034}
+  m_LocalRotation: {x: -0.7069834, y: 0, z: 0, w: 0.7072302}
+  m_LocalPosition: {x: 1.451, y: 1.2755805, z: 4.9209824}
+  m_LocalScale: {x: 31.42, y: 31.420027, z: 31.420027}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -454,6 +454,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1611641602 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1064505082711102213, guid: 1ff7d56ef0b5fce4bb024efe139d7afe, type: 3}
+  m_PrefabInstance: {fileID: 1019169370626800272}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1663457353
 GameObject:
   m_ObjectHideFlags: 0
@@ -2528,6 +2533,8 @@ MonoBehaviour:
   gripLeft: {fileID: 8369307212707653986}
   gripRight: {fileID: 6710875189015784092}
   grip: 0
+  cubePrefab: {fileID: 1611641602}
+  cubePos: {fileID: 441780174}
   CurrentSequenceState: 0
   MoveSpeed: 2
   t_arm: {x: 0, y: 0.76040596, z: 0, w: 0.64944804}

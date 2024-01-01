@@ -37,6 +37,8 @@ public class ArmController : MonoBehaviour
 
     public bool grip = false;
 
+    public GameObject cubePrefab;
+    public Transform cubePos;
     //rigidbodies
     Rigidbody[] rbs;
 
@@ -77,8 +79,6 @@ public class ArmController : MonoBehaviour
 
         if (automovement)
         {
-            CurrentSequenceState = 1;
-            Part0_mState = HoriontalMovement.COUNTERCLOCKWISE;
         }
         //{ StartCoroutine(FirstMove()); }
  
@@ -221,7 +221,7 @@ public class ArmController : MonoBehaviour
 
         if(Mathf.Abs(Mathf.Abs(t_arm.y) - 0.5f) <= 0.002f && CurrentSequenceState == 13)
         {
-            CurrentSequenceState += 1;
+            CurrentSequenceState = 0;
             Part0_mState = HoriontalMovement.NONE;
         }
 
@@ -286,6 +286,10 @@ public class ArmController : MonoBehaviour
 
     private void ManualControls()
     {
+        if (Input.GetKey("o"))
+        {
+            StartSequence();
+        }
         //moving part 0
         if (Input.GetKey("a"))
         {
@@ -355,6 +359,13 @@ public class ArmController : MonoBehaviour
 
     }
 
+    public void StartSequence()
+    {
+        if(CurrentSequenceState != 0){return;}
+        CurrentSequenceState = 1;
+        Part0_mState = HoriontalMovement.COUNTERCLOCKWISE;
+        Instantiate(cubePrefab, cubePos.position, Quaternion.Euler(0,0,0));
+    }
     #endregion
 
     // IEnumerator FirstMove()
