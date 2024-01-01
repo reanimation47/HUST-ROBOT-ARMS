@@ -38,8 +38,6 @@ public class ArmController : MonoBehaviour
 
     public bool grip = false;
 
-    public GameObject cubePrefab;
-    public Transform cubePos;
     //rigidbodies
     Rigidbody[] rbs;
 
@@ -60,7 +58,6 @@ public class ArmController : MonoBehaviour
     #region  MonoBehavior
     void Start()
     {
-        Application.targetFrameRate = 60;
         //create array of rigidbodies for future use
         rbs = new Rigidbody[6];
         rbs[0] = part0;
@@ -82,8 +79,8 @@ public class ArmController : MonoBehaviour
         if (automovement)
         {
         }
-        Time.timeScale = 2.0f;
         //{ StartCoroutine(FirstMove()); }
+        //Manager.Instance.respawnRobot(this.gameObject);
  
 
     }
@@ -91,11 +88,6 @@ public class ArmController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown("o"))
-        {
-            //StartSequence();
-            Instantiate(cubePrefab, cubePos.position, Quaternion.Euler(0,0,0));
-        }
     }
     void FixedUpdate()
     {
@@ -372,6 +364,7 @@ public class ArmController : MonoBehaviour
         {
             CurrentSequenceState = 0;
             Part0_mState = HoriontalMovement.NONE;
+            Manager.Instance.respawnRobot(this.gameObject);
         }
 
     }
