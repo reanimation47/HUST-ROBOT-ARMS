@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 
 
 //this is a prototype script
@@ -59,6 +60,7 @@ public class ArmController : MonoBehaviour
     #region  MonoBehavior
     void Start()
     {
+        Application.targetFrameRate = 60;
         //create array of rigidbodies for future use
         rbs = new Rigidbody[6];
         rbs[0] = part0;
@@ -80,6 +82,7 @@ public class ArmController : MonoBehaviour
         if (automovement)
         {
         }
+        Time.timeScale = 2.0f;
         //{ StartCoroutine(FirstMove()); }
  
 
@@ -88,6 +91,11 @@ public class ArmController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown("o"))
+        {
+            //StartSequence();
+            Instantiate(cubePrefab, cubePos.position, Quaternion.Euler(0,0,0));
+        }
     }
     void FixedUpdate()
     {
@@ -146,92 +154,21 @@ public class ArmController : MonoBehaviour
 
         }
 
+        DetectBox();
+
+        PickAndDropSequence();
 
 
 
-        if(Mathf.Abs(Mathf.Abs(t_arm.y) - 0) <= 0.005f && CurrentSequenceState == 1)
-        {
-            Part0_mState = HoriontalMovement.NONE;
-            CurrentSequenceState += 1;
-            Part1_mState = VerticalMovement.UPWARDS;
-        }
+        //Debug.LogWarning(q3_arm.x);
 
-        if(Mathf.Abs(q1_arm.x - 0.61f) <= 0.01f && CurrentSequenceState == 2)
-        {
-            Part1_mState = VerticalMovement.NONE;
-            CurrentSequenceState += 1;
-            Part3_mState = VerticalMovement.DOWNWARDS;
-        }
-
-        if(Mathf.Abs(Mathf.Abs(q3_arm.x) - 0.63f) <= 0.02f && CurrentSequenceState == 3)
-        {
-            CurrentSequenceState += 1;
-            Part3_mState = VerticalMovement.NONE;
-            grip = true;
-            Invoke("NextStep",1f);
-        }
-
-        if(CurrentSequenceState == 5)
-        {
-            CurrentSequenceState +=1;
-            Part1_mState = VerticalMovement.DOWNWARDS;
-        }
-
-        if(Mathf.Abs(Mathf.Abs(q1_arm.x) - 0f) <= 0.02f && CurrentSequenceState == 6)
-        {
-            CurrentSequenceState += 1;
-            Part1_mState = VerticalMovement.NONE;
-            Part0_mState = HoriontalMovement.CLOCKWISE;
-        }
-
-        if(Mathf.Abs(Mathf.Abs(t_arm.y) - 0.707f) <= 0.0005f && CurrentSequenceState == 7)
-        {
-            CurrentSequenceState += 1;
-            Part0_mState = HoriontalMovement.NONE;
-            Part1_mState = VerticalMovement.UPWARDS;
-        }
-
-        if(Mathf.Abs(Mathf.Abs(q1_arm.x) - 0.56f) <= 0.001f && CurrentSequenceState == 8)
-        {
-            CurrentSequenceState += 1;
-            Part1_mState = VerticalMovement.NONE;
-            Part3_mState = VerticalMovement.DOWNWARDS;
-        }
-
-        if(Mathf.Abs(Mathf.Abs(q3_arm.x) - 0.6f) <= 0.001f && CurrentSequenceState == 9)
-        {
-            CurrentSequenceState += 1;
-            Part3_mState = VerticalMovement.NONE;
-            grip = false;
-            Invoke("NextStep", 1f);
-        }
-
-        if(CurrentSequenceState == 11)
-        {
-            CurrentSequenceState += 1;
-            Part1_mState = VerticalMovement.DOWNWARDS;
-        }
-
-        if(Mathf.Abs(Mathf.Abs(q1_arm.x) - 0f) <= 0.002f && CurrentSequenceState == 12)
-        {
-            CurrentSequenceState += 1;
-            Part1_mState = VerticalMovement.NONE;
-            Part0_mState = HoriontalMovement.COUNTERCLOCKWISE;
-        }
-
-        if(Mathf.Abs(Mathf.Abs(t_arm.y) - 0.5f) <= 0.002f && CurrentSequenceState == 13)
-        {
-            CurrentSequenceState = 0;
-            Part0_mState = HoriontalMovement.NONE;
-        }
-
-        Debug.LogWarning(t_arm.y);
-
+            // var fixedRotation = part0.transform.localRotation.eulerAngles;
+            // Debug.LogWarning(fixedRotation);
 
     }
     #endregion
 
-    #region Customs
+    #region Movements
     private void CheckForMovementStates()
     {
         //Rotating part 0 // Arm's base
@@ -286,10 +223,6 @@ public class ArmController : MonoBehaviour
 
     private void ManualControls()
     {
-        if (Input.GetKey("o"))
-        {
-            StartSequence();
-        }
         //moving part 0
         if (Input.GetKey("a"))
         {
@@ -353,6 +286,96 @@ public class ArmController : MonoBehaviour
 
     }
 
+    private void PickAndDropSequence()
+    {
+        if(Mathf.Abs(Mathf.Abs(t_arm.y) - 0) <= 0.005f && CurrentSequenceState == 1)
+        {
+            Part0_mState = HoriontalMovement.NONE;
+            CurrentSequenceState += 1;
+            Part1_mState = VerticalMovement.UPWARDS;
+
+            var fixedRotation = part0.transform.localEulerAngles;
+            Debug.LogWarning(fixedRotation);
+            fixedRotation.z = 80;
+            part0.transform.localRotation = Quaternion.Euler(fixedRotation);
+        }
+
+        if(Mathf.Abs(q1_arm.x - 0.61f) <= 0.01f && CurrentSequenceState == 2)
+        {
+            Part1_mState = VerticalMovement.NONE;
+            CurrentSequenceState += 1;
+            Part3_mState = VerticalMovement.DOWNWARDS;
+        }
+
+        if(Mathf.Abs(Mathf.Abs(q3_arm.x) - 0.63f) <= 0.02f && CurrentSequenceState == 3)
+        {
+            CurrentSequenceState += 1;
+            Part3_mState = VerticalMovement.NONE;
+            grip = true;
+            Invoke("NextStep",1f);
+        }
+
+        if(CurrentSequenceState == 5)
+        {
+            CurrentSequenceState +=1;
+            Part1_mState = VerticalMovement.DOWNWARDS;
+        }
+
+        if(Mathf.Abs(Mathf.Abs(q1_arm.x) - 0f) <= 0.02f && CurrentSequenceState == 6)
+        {
+            CurrentSequenceState += 1;
+            Part1_mState = VerticalMovement.NONE;
+            Part0_mState = HoriontalMovement.CLOCKWISE;
+        }
+
+        if(Mathf.Abs(Mathf.Abs(t_arm.y) - 0.707f) <= 0.0005f && CurrentSequenceState == 7)
+        {
+            CurrentSequenceState += 1;
+            Part0_mState = HoriontalMovement.NONE;
+            Part1_mState = VerticalMovement.UPWARDS;
+
+            var fixedRotation = part0.transform.localRotation.eulerAngles;
+            Debug.LogWarning(fixedRotation);
+            fixedRotation.z = 264;
+            part0.transform.localRotation = Quaternion.Euler(fixedRotation);
+        }
+
+        if(Mathf.Abs(Mathf.Abs(q1_arm.x) - 0.56f) <= 0.001f && CurrentSequenceState == 8)
+        {
+            CurrentSequenceState += 1;
+            Part1_mState = VerticalMovement.NONE;
+            Part3_mState = VerticalMovement.DOWNWARDS;
+        }
+
+        if(Mathf.Abs(q3_arm.x + 0.6f) <= 0.001f && CurrentSequenceState == 9)
+        {
+            CurrentSequenceState += 1;
+            Part3_mState = VerticalMovement.NONE;
+            grip = false;
+            Invoke("NextStep", 1f);
+        }
+
+        if(CurrentSequenceState == 11)
+        {
+            CurrentSequenceState += 1;
+            Part1_mState = VerticalMovement.DOWNWARDS;
+        }
+
+        if(Mathf.Abs(Mathf.Abs(q1_arm.x) - 0f) <= 0.002f && CurrentSequenceState == 12)
+        {
+            CurrentSequenceState += 1;
+            Part1_mState = VerticalMovement.NONE;
+            Part0_mState = HoriontalMovement.COUNTERCLOCKWISE;
+        }
+
+        if(Mathf.Abs(Mathf.Abs(t_arm.y) - 0.5f) <= 0.002f && CurrentSequenceState == 13)
+        {
+            CurrentSequenceState = 0;
+            Part0_mState = HoriontalMovement.NONE;
+        }
+
+    }
+
     private void NextStep()
     {
         CurrentSequenceState += 1;
@@ -364,10 +387,24 @@ public class ArmController : MonoBehaviour
         if(CurrentSequenceState != 0){return;}
         CurrentSequenceState = 1;
         Part0_mState = HoriontalMovement.COUNTERCLOCKWISE;
-        Instantiate(cubePrefab, cubePos.position, Quaternion.Euler(0,0,0));
+        //Instantiate(cubePrefab, cubePos.position, Quaternion.Euler(0,0,0));
     }
     #endregion
 
+    #region Box Detection
+    private void DetectBox()
+    {
+        RaycastHit hit;
+        Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward)*4, Color.yellow);
+        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, 5f))
+        {
+            if(hit.transform.gameObject.layer != 3){return;}
+            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.red);
+            Debug.Log("Did Hit");
+            StartSequence();
+        }
+    }
+    #endregion
     // IEnumerator FirstMove()
     // {
     //     //Rotates Arm to correct position

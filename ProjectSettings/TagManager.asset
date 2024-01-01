@@ -3,12 +3,14 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - robot
+  - cube
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Target Box
   - Water
   - UI
   - 
