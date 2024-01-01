@@ -26,6 +26,7 @@ public class Manager : MonoBehaviour
     }
     void Start()
     {
+        Screen.SetResolution(1920, 1080, true);
         Application.targetFrameRate = 60;
         Time.timeScale = 2.0f;
     }
