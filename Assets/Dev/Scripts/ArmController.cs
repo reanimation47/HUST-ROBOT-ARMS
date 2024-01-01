@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -39,6 +40,8 @@ public class ArmController : MonoBehaviour
     //rigidbodies
     Rigidbody[] rbs;
 
+    public int CurrentSequenceState = 0;
+    public float MoveSpeed = 2; // Less -> More accuracy
 
 
 
@@ -73,12 +76,19 @@ public class ArmController : MonoBehaviour
 
 
         if (automovement)
-        { StartCoroutine(FirstMove()); }
+        {
+            CurrentSequenceState = 1;
+            Part0_mState = HoriontalMovement.COUNTERCLOCKWISE;
+        }
+        //{ StartCoroutine(FirstMove()); }
  
 
     }
 
     // Update is called once per frame
+    void Update()
+    {
+    }
     void FixedUpdate()
     {
         //set gravity if changed
@@ -114,85 +124,65 @@ public class ArmController : MonoBehaviour
         //setting forces to zero
         //setFrictionToJoints();
 
-        if (automovement == false)
+        if (!automovement == false)
         {
-            //moving part 0
-            if (Input.GetKey("a"))
-            {
-                Debug.LogWarning("aaa");
-                part0.AddTorque(-torque[0] * part0.mass * part0.transform.forward);
-            }
-            if (Input.GetKey("d"))
-            {
-                part0.AddTorque(torque[0] * part0.mass * part0.transform.forward);
-            }
-
-            //moving part 1
-            if (Input.GetKey("w"))
-            {
-                part1.AddTorque(-torque[1] * part1.mass * part1.transform.forward);
-            }
-            if (Input.GetKey("s"))
-            {
-                part1.AddTorque(torque[1] * part1.mass * part1.transform.forward);
-            }
-
-            //moving part 2
-            if (Input.GetKey("q"))
-            {
-                part2.AddTorque(-torque[2] * part2.mass * part2.transform.forward);
-
-            }
-            if (Input.GetKey("e"))
-            {
-                part2.AddTorque(torque[2] * part2.mass * part2.transform.forward);
-            }
-
-            //moving part 3
-            if (Input.GetKey("z"))
-            {
-                part3.AddTorque(-torque[3] * part3.mass * part3.transform.right);
-            }
-            if (Input.GetKey("c"))
-            {
-                part3.AddTorque(torque[3] * part3.mass * part3.transform.right);
-            }
-
-
-            //moving grips
-            if (Input.GetKeyDown("x"))
-            {
-                grip = !grip;
-
-            }
-
-
-
+            ManualControls();
         }
 
 
+        UpdateRotationValues();
         CheckForMovementStates();
 
         if (grip)
         {
-            gripLeft.AddTorque(torque[4] * gripLeft.mass * gripLeft.transform.forward);
-            gripRight.AddTorque(torque[4] * gripRight.mass * gripRight.transform.forward);
+            gripLeft.AddTorque(torque[4] * gripLeft.mass * gripLeft.transform.forward * MoveSpeed);
+            gripRight.AddTorque(torque[4] * gripRight.mass * gripRight.transform.forward * MoveSpeed);
 
         }
         else
         {
-            gripLeft.AddTorque(-torque[4] * gripLeft.mass * gripLeft.transform.forward);
-            gripRight.AddTorque(-torque[4] * gripRight.mass * gripRight.transform.forward);
+            gripLeft.AddTorque(-torque[4] * gripLeft.mass * gripLeft.transform.forward * MoveSpeed);
+            gripRight.AddTorque(-torque[4] * gripRight.mass * gripRight.transform.forward * MoveSpeed);
 
         }
 
 
 
-        //show reative rotation on the inspector
-        t_arm = part0.transform.localRotation;
-        q1_arm = part1.transform.localRotation;
-        q2_arm = part2.transform.localRotation;
-        q3_arm = part3.transform.localRotation;
+
+        if(Mathf.Abs(t_arm.y - 0) <= 0.01f && CurrentSequenceState == 1)
+        {
+            Part0_mState = HoriontalMovement.NONE;
+            CurrentSequenceState += 1;
+            Part1_mState = VerticalMovement.UPWARDS;
+        }
+
+        if(Mathf.Abs(q1_arm.x - 0.61f) <= 0.01f && CurrentSequenceState == 2)
+        {
+            Part1_mState = VerticalMovement.NONE;
+            CurrentSequenceState += 1;
+            Part3_mState = VerticalMovement.DOWNWARDS;
+        }
+
+        if(Mathf.Abs(Mathf.Abs(q3_arm.x) - 0.63f) <= 0.02f && CurrentSequenceState == 3)
+        {
+            CurrentSequenceState += 1;
+            Part3_mState = VerticalMovement.NONE;
+            grip = true;
+            Invoke("NextStep",1f);
+        }
+
+        if(CurrentSequenceState == 5)
+        {
+            CurrentSequenceState +=1;
+            Part1_mState = VerticalMovement.DOWNWARDS;
+        }
+
+        if(Mathf.Abs(Mathf.Abs(q1_arm.x) - 0f) <= 0.02f && CurrentSequenceState == 6)
+        {
+            CurrentSequenceState += 1;
+            Part1_mState = VerticalMovement.NONE;
+        }
+        Debug.LogWarning(t_arm.y);
 
 
     }
@@ -205,10 +195,10 @@ public class ArmController : MonoBehaviour
         switch(Part0_mState)
         {
             case HoriontalMovement.CLOCKWISE:
-                part0.AddTorque(torque[0] * part0.mass * part0.transform.forward);
+                part0.AddTorque(torque[0] * part0.mass * part0.transform.forward * MoveSpeed);
                 break;
             case HoriontalMovement.COUNTERCLOCKWISE:
-                part0.AddTorque(-torque[0] * part0.mass * part0.transform.forward);
+                part0.AddTorque(-torque[0] * part0.mass * part0.transform.forward * MoveSpeed);
                 break;
             default:
                 break;
@@ -217,10 +207,10 @@ public class ArmController : MonoBehaviour
         switch(Part1_mState)
         {
             case VerticalMovement.UPWARDS:
-                part1.AddTorque(-torque[1] * part1.mass * part1.transform.forward);
+                part1.AddTorque(-torque[1] * part1.mass * part1.transform.forward * MoveSpeed);
                 break;
             case VerticalMovement.DOWNWARDS:
-                part1.AddTorque(torque[1] * part1.mass * part1.transform.forward);
+                part1.AddTorque(torque[1] * part1.mass * part1.transform.forward * MoveSpeed);
                 break;
             default:
                 break;
@@ -229,10 +219,10 @@ public class ArmController : MonoBehaviour
         switch(Part2_mState)
         {
             case VerticalMovement.UPWARDS:
-                part2.AddTorque(torque[2] * part2.mass * part2.transform.forward);
+                part2.AddTorque(torque[2] * part2.mass * part2.transform.forward * MoveSpeed);
                 break;
             case VerticalMovement.DOWNWARDS:
-                part2.AddTorque(-torque[2] * part2.mass * part2.transform.forward);
+                part2.AddTorque(-torque[2] * part2.mass * part2.transform.forward * MoveSpeed);
                 break;
             default:
                 break;
@@ -251,16 +241,86 @@ public class ArmController : MonoBehaviour
 
     }
 
-    #endregion
-
-    IEnumerator FirstMove()
+    private void ManualControls()
     {
-        while (true)
+        //moving part 0
+        if (Input.GetKey("a"))
         {
+            Debug.LogWarning("aaa");
+            part0.AddTorque(-torque[0] * part0.mass * part0.transform.forward * MoveSpeed);
+        }
+        if (Input.GetKey("d"))
+        {
+            part0.AddTorque(torque[0] * part0.mass * part0.transform.forward * MoveSpeed);
+        }
 
+        //moving part 1
+        if (Input.GetKey("w"))
+        {
+            part1.AddTorque(-torque[1] * part1.mass * part1.transform.forward * MoveSpeed);
+        }
+        if (Input.GetKey("s"))
+        {
+            part1.AddTorque(torque[1] * part1.mass * part1.transform.forward * MoveSpeed);
+        }
+
+        //moving part 2
+        if (Input.GetKey("q"))
+        {
+            part2.AddTorque(-torque[2] * part2.mass * part2.transform.forward * MoveSpeed);
 
         }
+        if (Input.GetKey("e"))
+        {
+            part2.AddTorque(torque[2] * part2.mass * part2.transform.forward * MoveSpeed);
+        }
+
+        //moving part 3
+        if (Input.GetKey("z"))
+        {
+            part3.AddTorque(-torque[3] * part3.mass * part3.transform.right);
+        }
+        if (Input.GetKey("c"))
+        {
+            part3.AddTorque(torque[3] * part3.mass * part3.transform.right);
+        }
+
+
+        //moving grips
+        if (Input.GetKeyDown("x"))
+        {
+            grip = !grip;
+
+        }
+
+
     }
+
+    private void UpdateRotationValues()
+    {
+        //show reative rotation on the inspector
+        t_arm = part0.transform.localRotation;
+        q1_arm = part1.transform.localRotation;
+        q2_arm = part2.transform.localRotation;
+        q3_arm = part3.transform.localRotation;
+
+    }
+
+    private void NextStep()
+    {
+        CurrentSequenceState += 1;
+
+    }
+
+    #endregion
+
+    // IEnumerator FirstMove()
+    // {
+    //     //Rotates Arm to correct position
+    //     Part0_mState = HoriontalMovement.CLOCKWISE;
+    //     yield return null;
+    // }
+
 
 
 }
