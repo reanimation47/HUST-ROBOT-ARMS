@@ -1138,7 +1138,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6243470033140811758, guid: 2b3d1627881a24c83a2a98506276eb1d, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -19.8
+      value: -20
       objectReference: {fileID: 0}
     - target: {fileID: 6243470033140811758, guid: 2b3d1627881a24c83a2a98506276eb1d, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2719,16 +2719,8 @@ PrefabInstance:
     m_TransformParent: {fileID: 1231265230}
     m_Modifications:
     - target: {fileID: 650189002228102094, guid: 1ff7d56ef0b5fce4bb024efe139d7afe, type: 3}
-      propertyPath: m_Drag
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 650189002228102094, guid: 1ff7d56ef0b5fce4bb024efe139d7afe, type: 3}
       propertyPath: m_Mass
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 650189002228102094, guid: 1ff7d56ef0b5fce4bb024efe139d7afe, type: 3}
-      propertyPath: m_AngularDrag
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1064505082711102213, guid: 1ff7d56ef0b5fce4bb024efe139d7afe, type: 3}
       propertyPath: m_Name
