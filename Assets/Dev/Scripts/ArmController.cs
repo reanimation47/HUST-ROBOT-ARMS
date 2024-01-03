@@ -280,6 +280,7 @@ public class ArmController : MonoBehaviour
 
     private void PickAndDropSequence()
     {
+        Debug.LogWarning(q3_arm.x);
         if(Mathf.Abs(Mathf.Abs(t_arm.y) - 0) <= 0.005f && CurrentSequenceState == 1)
         {
             Part0_mState = HoriontalMovement.NONE;
@@ -299,7 +300,7 @@ public class ArmController : MonoBehaviour
             Part3_mState = VerticalMovement.DOWNWARDS;
         }
 
-        if(Mathf.Abs(Mathf.Abs(q3_arm.x) - 0.63f) <= 0.02f && CurrentSequenceState == 3)
+        if(q3_arm.x <= -0.601f && CurrentSequenceState == 3)
         {
             CurrentSequenceState += 1;
             Part3_mState = VerticalMovement.NONE;
@@ -339,7 +340,7 @@ public class ArmController : MonoBehaviour
             Part3_mState = VerticalMovement.DOWNWARDS;
         }
 
-        if(Mathf.Abs(q3_arm.x + 0.6f) <= 0.001f && CurrentSequenceState == 9)
+        if(q3_arm.x <= -0.601f && CurrentSequenceState == 9)
         {
             CurrentSequenceState += 1;
             Part3_mState = VerticalMovement.NONE;
