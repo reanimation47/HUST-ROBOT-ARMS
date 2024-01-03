@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,6 +10,8 @@ public class Manager : MonoBehaviour
     public GameObject cubePrefab;
     public GameObject robotArm;
     public Transform cubePos;
+
+    public List<GameObject> RobotArms;
 
     private void Awake() 
     { 
@@ -31,6 +34,10 @@ public class Manager : MonoBehaviour
         //Screen.SetResolution(1920, 1080, true);
 
         Time.timeScale = 2.0f;
+        foreach (var arm in RobotArms)
+        {
+            //respawnRobot(arm);
+        }
     }
     void Update()
     {
@@ -54,7 +61,8 @@ public class Manager : MonoBehaviour
     public void respawnRobot(GameObject r)
     {
         var pos = r.transform.position;
-        DestroyImmediate(r);
+        //DestroyImmediate(r);
+        r.SetActive(false);
         Instantiate(robotArm, pos, Quaternion.Euler(0,0,0));
 
     }

@@ -282,7 +282,8 @@ public class ArmController : MonoBehaviour
 
     private void PickAndDropSequence()
     {
-        Debug.LogWarning(q3_arm.x);
+        //Debug.LogWarning(q3_arm.x);
+        Debug.LogWarning(part3.transform.rotation.eulerAngles.x);
 
         //Leans toward the cube
         if(t_arm.y <= 0.001f && CurrentSequenceState == 1)
@@ -308,16 +309,17 @@ public class ArmController : MonoBehaviour
         }
 
         //Grabs the cube
-        if(q3_arm.x <= -0.601f && CurrentSequenceState == 3)
+        if(q3_arm.x <= -0.6f && CurrentSequenceState == 3)
         {
+            //Debug.LogWarning(q3_arm.x);
             CurrentSequenceState += 1;
             Part3_mState = VerticalMovement.NONE;
-            var fixedRotation = part3.transform.localEulerAngles;
 
             //Readjust to fix small errors
+            Debug.LogWarning(part3.transform.rotation.eulerAngles);
+            var fixedRotation = part3.transform.localEulerAngles;
             fixedRotation.x = 63.30f;
             part3.transform.localRotation = Quaternion.Euler(fixedRotation);
-            //Debug.LogWarning(fixedRotation);
             grip = true;
             Invoke("NextStep",1f);
         }
