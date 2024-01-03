@@ -26,7 +26,7 @@ public class Manager : MonoBehaviour
     }
     void Start()
     {
-        Application.targetFrameRate = 60;
+        Application.targetFrameRate = 30;
         Screen.orientation = ScreenOrientation.LandscapeLeft;
         //Screen.SetResolution(1920, 1080, true);
 

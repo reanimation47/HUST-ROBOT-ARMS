@@ -78,9 +78,6 @@ public class ArmController : MonoBehaviour
         //
 
 
-        if (automovement)
-        {
-        }
         //{ StartCoroutine(FirstMove()); }
         //Manager.Instance.respawnRobot(this.gameObject);
  
@@ -88,9 +85,6 @@ public class ArmController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    {
-    }
     void FixedUpdate()
     {
         //set gravity if changed
@@ -128,7 +122,7 @@ public class ArmController : MonoBehaviour
 
         if (!automovement == false)
         {
-            ManualControls();
+            //ManualControls();
         }
 
 
