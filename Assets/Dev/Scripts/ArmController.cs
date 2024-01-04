@@ -76,7 +76,7 @@ public class ArmController : MonoBehaviour
         q3_arm = part3.transform.rotation;
         //Debug.LogWarning(part0.transform.rotation.eulerAngles);
         part1.transform.rotation = Quaternion.Euler(new Vector3(0.02f,0f,90));
-        Debug.LogWarning(part3.transform.rotation.eulerAngles);
+        //Debug.LogWarning(part3.transform.rotation.eulerAngles);
         //Debug.LogWarning(part3.transform.rotation.eulerAngles);
 
         //
@@ -281,6 +281,7 @@ public class ArmController : MonoBehaviour
     private void PickAndDropSequence()
     {
         //Debug.LogWarning(q3_arm.x);
+        Debug.LogWarning(part3.transform.rotation.eulerAngles.x);
 
         //Leans toward the cube
         if(t_arm.y <= 0.001f && CurrentSequenceState == 1)
@@ -300,6 +301,7 @@ public class ArmController : MonoBehaviour
         //Lowers the grip 
         if(q1_arm.x >= 0.6f && CurrentSequenceState == 2)
         {
+            //Debug.LogWarning(part1.transform.rotation.eulerAngles);
             Part1_mState = VerticalMovement.NONE;
             CurrentSequenceState += 1;
             Part3_mState = VerticalMovement.DOWNWARDS;
@@ -311,11 +313,11 @@ public class ArmController : MonoBehaviour
             //Debug.LogWarning(part3.transform.rotation.eulerAngles.x);
             CurrentSequenceState += 1;
             Part3_mState = VerticalMovement.NONE;
-            // var fixedRotation = part3.transform.localEulerAngles;
 
             // //Readjust to fix small errors
-            // fixedRotation.x = 63.30f;
-            // part3.transform.localRotation = Quaternion.Euler(fixedRotation);
+            var fixedRotation = part3.transform.rotation.eulerAngles;
+            fixedRotation.x = 70.02f;
+            part3.transform.rotation = Quaternion.Euler(fixedRotation);
             //Debug.LogWarning(fixedRotation);
             grip = true;
             Invoke("NextStep",1f);
@@ -359,8 +361,13 @@ public class ArmController : MonoBehaviour
         }
 
         //Drops off the cube
-        if(q3_arm.x < -0.59f && CurrentSequenceState == 9)
+        if(part3.transform.rotation.eulerAngles.x > 68f && CurrentSequenceState == 9)
         {
+            var fixedRotation = part3.transform.rotation.eulerAngles;
+            fixedRotation.x = 68.02f;
+            part3.transform.rotation = Quaternion.Euler(fixedRotation);
+
+            //Debug.LogWarning(part3.transform.rotation.eulerAngles.x);
             // var fixedRotation = part3.transform.localEulerAngles;
             // //Debug.LogWarning(fixedRotation);
             // fixedRotation.x = 66.30f;
