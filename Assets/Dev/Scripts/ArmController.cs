@@ -11,6 +11,8 @@ public class ArmController : MonoBehaviour
 {
         
     #region Refs
+    public Transform targetBoxDir;//Same pos as box to pick up
+    public Transform targetBoxDir_drop;//Same pos as drop off 
     // gravity will work if this is enabled
     public bool gravityON;
 
@@ -42,7 +44,7 @@ public class ArmController : MonoBehaviour
     Rigidbody[] rbs;
 
     public int CurrentSequenceState = 0;
-    public float MoveSpeed = 2; // Less -> More accuracy
+    public float MoveSpeed = 1; // Less -> More accuracy
 
 
 
@@ -72,13 +74,14 @@ public class ArmController : MonoBehaviour
         q1_arm = part1.transform.rotation;
         q2_arm = part2.transform.rotation;
         q3_arm = part3.transform.rotation;
+        //Debug.LogWarning(part0.transform.rotation.eulerAngles);
+        part1.transform.rotation = Quaternion.Euler(new Vector3(0.02f,0f,90));
+        Debug.LogWarning(part3.transform.rotation.eulerAngles);
+        //Debug.LogWarning(part3.transform.rotation.eulerAngles);
 
         //
 
 
-        if (automovement)
-        {
-        }
         //{ StartCoroutine(FirstMove()); }
         //Manager.Instance.respawnRobot(this.gameObject);
  
@@ -86,9 +89,6 @@ public class ArmController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    {
-    }
     void FixedUpdate()
     {
         //set gravity if changed
@@ -126,7 +126,7 @@ public class ArmController : MonoBehaviour
 
         if (!automovement == false)
         {
-            ManualControls();
+            //ManualControls();
         }
 
 
@@ -141,13 +141,14 @@ public class ArmController : MonoBehaviour
         }
         else
         {
-            gripLeft.AddTorque(-torque[4] * gripLeft.mass * gripLeft.transform.forward * MoveSpeed);
-            gripRight.AddTorque(-torque[4] * gripRight.mass * gripRight.transform.forward * MoveSpeed);
+            gripLeft.AddTorque(-torque[4] * gripLeft.mass * gripLeft.transform.forward* MoveSpeed);
+            gripRight.AddTorque(-torque[4] * gripRight.mass * gripRight.transform.forward* MoveSpeed);
 
         }
 
         DetectBox();
 
+        //AdjustPerfectRotation();
         PickAndDropSequence();
 
 
@@ -218,7 +219,6 @@ public class ArmController : MonoBehaviour
         //moving part 0
         if (Input.GetKey("a"))
         {
-            Debug.LogWarning("aaa");
             part0.AddTorque(-torque[0] * part0.mass * part0.transform.forward * MoveSpeed);
         }
         if (Input.GetKey("d"))
@@ -280,40 +280,55 @@ public class ArmController : MonoBehaviour
 
     private void PickAndDropSequence()
     {
-        Debug.LogWarning(q3_arm.x);
-        if(Mathf.Abs(Mathf.Abs(t_arm.y) - 0) <= 0.005f && CurrentSequenceState == 1)
+        //Debug.LogWarning(q3_arm.x);
+
+        //Leans toward the cube
+        if(t_arm.y <= 0.001f && CurrentSequenceState == 1)
         {
             Part0_mState = HoriontalMovement.NONE;
+            //RotateToDir(part0.transform, targetBoxDir); // Adjust to perfect dir
             CurrentSequenceState += 1;
             Part1_mState = VerticalMovement.UPWARDS;
+            Invoke("AdjustPerfectRotation", 0.1f);
 
-            var fixedRotation = part0.transform.localEulerAngles;
-            Debug.LogWarning(fixedRotation);
-            fixedRotation.z = 80;
-            part0.transform.localRotation = Quaternion.Euler(fixedRotation);
+            // var fixedRotation = part0.transform.localEulerAngles;
+            // Debug.LogWarning(fixedRotation);
+            // fixedRotation.z = 80;
+            // part0.transform.localRotation = Quaternion.Euler(fixedRotation);
         }
 
-        if(Mathf.Abs(q1_arm.x - 0.61f) <= 0.01f && CurrentSequenceState == 2)
+        //Lowers the grip 
+        if(q1_arm.x >= 0.6f && CurrentSequenceState == 2)
         {
             Part1_mState = VerticalMovement.NONE;
             CurrentSequenceState += 1;
             Part3_mState = VerticalMovement.DOWNWARDS;
         }
 
-        if(q3_arm.x <= -0.601f && CurrentSequenceState == 3)
+        //Grabs the cube
+        if(part3.transform.rotation.eulerAngles.x > 70f && CurrentSequenceState == 3)
         {
+            //Debug.LogWarning(part3.transform.rotation.eulerAngles.x);
             CurrentSequenceState += 1;
             Part3_mState = VerticalMovement.NONE;
+            // var fixedRotation = part3.transform.localEulerAngles;
+
+            // //Readjust to fix small errors
+            // fixedRotation.x = 63.30f;
+            // part3.transform.localRotation = Quaternion.Euler(fixedRotation);
+            //Debug.LogWarning(fixedRotation);
             grip = true;
             Invoke("NextStep",1f);
         }
 
+        //Raises hand back to neutral position
         if(CurrentSequenceState == 5)
         {
             CurrentSequenceState +=1;
             Part1_mState = VerticalMovement.DOWNWARDS;
         }
 
+        //Rotates hand to drop off position
         if(Mathf.Abs(Mathf.Abs(q1_arm.x) - 0f) <= 0.02f && CurrentSequenceState == 6)
         {
             CurrentSequenceState += 1;
@@ -321,18 +336,21 @@ public class ArmController : MonoBehaviour
             Part0_mState = HoriontalMovement.CLOCKWISE;
         }
 
-        if(Mathf.Abs(Mathf.Abs(t_arm.y) - 0.707f) <= 0.0005f && CurrentSequenceState == 7)
+        //Leans hand toward drop off position
+        if(t_arm.y < -0.706 && CurrentSequenceState == 7)
         {
             CurrentSequenceState += 1;
             Part0_mState = HoriontalMovement.NONE;
             Part1_mState = VerticalMovement.UPWARDS;
+            Invoke("AdjustPerfectRotation", 0.1f);
 
-            var fixedRotation = part0.transform.localRotation.eulerAngles;
-            Debug.LogWarning(fixedRotation);
-            fixedRotation.z = 264;
-            part0.transform.localRotation = Quaternion.Euler(fixedRotation);
+            // var fixedRotation = part0.transform.localRotation.eulerAngles;
+            // Debug.LogWarning(fixedRotation);
+            // fixedRotation.z = 264;
+            // part0.transform.localRotation = Quaternion.Euler(fixedRotation);
         }
 
+        //Lowers the grip
         if(Mathf.Abs(Mathf.Abs(q1_arm.x) - 0.56f) <= 0.001f && CurrentSequenceState == 8)
         {
             CurrentSequenceState += 1;
@@ -340,20 +358,28 @@ public class ArmController : MonoBehaviour
             Part3_mState = VerticalMovement.DOWNWARDS;
         }
 
-        if(q3_arm.x <= -0.601f && CurrentSequenceState == 9)
+        //Drops off the cube
+        if(q3_arm.x < -0.59f && CurrentSequenceState == 9)
         {
+            // var fixedRotation = part3.transform.localEulerAngles;
+            // //Debug.LogWarning(fixedRotation);
+            // fixedRotation.x = 66.30f;
+            // part3.transform.localRotation = Quaternion.Euler(fixedRotation);
+
             CurrentSequenceState += 1;
             Part3_mState = VerticalMovement.NONE;
             grip = false;
             Invoke("NextStep", 1f);
         }
 
+        //Raises hand back to neutral position
         if(CurrentSequenceState == 11)
         {
             CurrentSequenceState += 1;
             Part1_mState = VerticalMovement.DOWNWARDS;
         }
 
+        //Rotates hand back to starting position
         if(Mathf.Abs(Mathf.Abs(q1_arm.x) - 0f) <= 0.002f && CurrentSequenceState == 12)
         {
             CurrentSequenceState += 1;
@@ -361,7 +387,8 @@ public class ArmController : MonoBehaviour
             Part0_mState = HoriontalMovement.COUNTERCLOCKWISE;
         }
 
-        if(Mathf.Abs(Mathf.Abs(t_arm.y) - 0.5f) <= 0.002f && CurrentSequenceState == 13)
+        //Stops - 1 cycle done
+        if(t_arm.y >= -0.49f && CurrentSequenceState == 13)
         {
             CurrentSequenceState = 0;
             Part0_mState = HoriontalMovement.NONE;
@@ -379,9 +406,9 @@ public class ArmController : MonoBehaviour
     public void StartSequence()
     {
         if(CurrentSequenceState != 0){return;}
+        //Starts rotating base to cube's direction
         CurrentSequenceState = 1;
         Part0_mState = HoriontalMovement.COUNTERCLOCKWISE;
-        //Instantiate(cubePrefab, cubePos.position, Quaternion.Euler(0,0,0));
     }
     #endregion
 
@@ -397,6 +424,28 @@ public class ArmController : MonoBehaviour
             Debug.Log("Did Hit");
             StartSequence();
         }
+    }
+    #endregion
+
+    #region Others
+    private void AdjustPerfectRotation()
+    {
+        if(CurrentSequenceState == 2)
+        {
+            RotateToDir(part0.transform, targetBoxDir); // Adjust to perfect dir
+        }else if(CurrentSequenceState == 8)
+        {
+            RotateToDir(part0.transform, targetBoxDir_drop); // Adjust to perfect dir
+        }
+
+    }
+    private void RotateToDir(Transform start, Transform target, int dir = 1)
+    {
+        float x = start.rotation.eulerAngles.x;
+        float z = start.rotation.eulerAngles.z;
+        Quaternion tempRotation = Quaternion.LookRotation(target.position - start.position);
+        start.rotation = Quaternion.Euler(x, dir *tempRotation.eulerAngles.y, z);
+
     }
     #endregion
     // IEnumerator FirstMove()
